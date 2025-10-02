@@ -1,0 +1,55 @@
+# Stable Diffusion Image Generation with LoRA Fine-Tuning
+
+## Environment Setup
+
+```bash
+# Create & activate virtual environment
+python3 -m venv ~/dreambooth-env
+source ~/dreambooth-env/bin/activate
+
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Clone Hugging Face diffusers (specific commit for reproducibility)
+git clone https://github.com/huggingface/diffusers.git
+cd diffusers
+git checkout 73a9d5856f2d7ae3637c484d83cd697284ad3962
+pip install -e .
+
+# Reactivate environment if needed
+source ~/dreambooth-env/bin/activate
+
+
+## Training (LoRA Fine-Tuning)
+
+cd ~/diffusers/examples/dreambooth
+
+python train_dreambooth_lora.py \
+  --pretrained_model_name_or_path runwayml/stable-diffusion-v1-5 \
+  --instance_data_dir ~/INSTANCE_IMAGES_DIR \
+  --instance_prompt "a photo of a NaCl crystal deposit" \
+  --class_data_dir ~/CLASS_IMAGES_DIR \
+  --class_prompt "a salt stain on a pitch-black background" \
+  --with_prior_preservation \
+  --prior_loss_weight 2.0 \
+  --resolution 512 \
+  --output_dir ~/OUTPUT_DIR \
+  --train_batch_size 1 \
+  --max_train_steps 1600 \
+  --learning_rate 1e-4 \
+  --rank 8 \
+  --mixed_precision fp16 \
+  --seed 42
+
+
+## Inference (Synthetic Image Generation)
+
+   python3 inference_generate_images.py
+
+
+References:
+
+1. Hugging Face Diffusers: https://github.com/huggingface/diffusers
+
+2. RunwayML Stable Diffusion v2.0: https://https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5
